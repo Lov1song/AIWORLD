@@ -1,0 +1,43 @@
+# Environment variables (never commit real secrets)
+backend/.env
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+*.log
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Alembic (keep versions, ignore generated pyc)
+backend/alembic/versions/__pycache__/
+
+# Docker volumes / data
+pgdata/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & tools
+.vscode/
+.idea/
+*.swp
+*.swo
+.claude/

@@ -1,0 +1,2208 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>异界编年史</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+SC:wght@300;400;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0806;
+      --surface: #110e0b;
+      --border: #2a2018;
+      --gold: #c9a84c;
+      --gold-dim: #7a5f28;
+      --text: #e8dcc8;
+      --text-dim: #7a6e5e;
+      --red: #8b2a2a;
+      --red-bright: #c0392b;
+      --glow: rgba(201, 168, 76, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Serif SC', serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(201, 168, 76, 0.03) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(139, 42, 42, 0.05) 0%, transparent 50%);
+    }
+
+    header {
+      width: 100%;
+      text-align: center;
+      padding: 40px 20px 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    header h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(26px, 5vw, 48px);
+      color: var(--gold);
+      letter-spacing: 0.15em;
+      text-shadow: 0 0 40px rgba(201, 168, 76, 0.4);
+      animation: flicker 6s infinite;
+    }
+
+    header p {
+      margin-top: 6px;
+      color: var(--text-dim);
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+
+    @keyframes flicker {
+
+      0%,
+      95%,
+      100% {
+        opacity: 1
+      }
+
+      96% {
+        opacity: .85
+      }
+
+      97% {
+        opacity: 1
+      }
+
+      98% {
+        opacity: .9
+      }
+    }
+
+    .divider {
+      width: 100%;
+      max-width: 960px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .divider::before {
+      content: '✦';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--gold-dim);
+      font-size: 10px;
+      background: var(--bg);
+      padding: 0 8px;
+    }
+
+    main {
+      width: 100%;
+      max-width: 980px;
+      padding: 0 16px 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── 设定面板 ── */
+    #setup-panel {
+      max-width: 700px;
+      margin: 28px auto 0;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 28px;
+      animation: fadeIn .8s ease;
+    }
+
+    .panel-title {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+
+    textarea,
+    input[type="text"] {
+      width: 100%;
+      background: rgba(0, 0, 0, .4);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Noto Serif SC', serif;
+      font-size: 13px;
+      padding: 10px 14px;
+      outline: none;
+      resize: vertical;
+      transition: border-color .3s;
+      line-height: 1.7;
+    }
+
+    textarea:focus,
+    input[type="text"]:focus {
+      border-color: var(--gold-dim);
+      box-shadow: 0 0 16px var(--glow);
+    }
+
+    textarea {
+      min-height: 80px;
+    }
+
+    .templates {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .template-btn {
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      font-family: 'Noto Serif SC', serif;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .template-btn:hover {
+      border-color: var(--gold-dim);
+      color: var(--gold);
+      background: var(--glow);
+    }
+
+    .tone-btn.active {
+      border-color: var(--gold-dim);
+      color: var(--gold);
+      background: var(--glow);
+    }
+
+    /* 属性分配 */
+    .stats-allocator {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .stat-item {
+      border: 1px solid var(--border);
+      background: rgba(0, 0, 0, .3);
+      padding: 10px;
+      text-align: center;
+    }
+
+    .stat-item label {
+      font-size: 10px;
+      color: var(--gold-dim);
+      margin-bottom: 6px;
+      letter-spacing: .2em;
+    }
+
+    .stat-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .stat-btn {
+      width: 22px;
+      height: 22px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stat-btn:hover {
+      border-color: var(--gold-dim);
+      color: var(--gold);
+    }
+
+    .stat-val {
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      color: var(--gold);
+      min-width: 24px;
+    }
+
+    .points-left {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 8px;
+      letter-spacing: .15em;
+    }
+
+    .points-left span {
+      color: var(--gold);
+      font-family: 'Cinzel', serif;
+    }
+
+    .start-btn {
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      border: 1px solid var(--gold-dim);
+      color: var(--gold);
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      letter-spacing: .3em;
+      cursor: pointer;
+      transition: all .3s;
+      margin-top: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .start-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(201, 168, 76, .1), transparent);
+      transform: translateX(-100%);
+      transition: transform .5s;
+    }
+
+    .start-btn:hover::before {
+      transform: translateX(100%);
+    }
+
+    .start-btn:hover {
+      border-color: var(--gold);
+      box-shadow: 0 0 24px var(--glow), inset 0 0 24px var(--glow);
+    }
+
+    /* ── 游戏面板 ── */
+    #game-panel {
+      display: none;
+      margin-top: 24px;
+    }
+
+    .game-layout {
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    /* 侧边栏 */
+    #sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: sticky;
+      top: 16px;
+    }
+
+    .sidebar-box {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 14px;
+    }
+
+    .sidebar-title {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      color: var(--gold-dim);
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .char-name-display {
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      color: var(--gold);
+      text-align: center;
+      letter-spacing: .12em;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hp-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-bottom: 5px;
+      letter-spacing: .1em;
+    }
+
+    .hp-label span:last-child {
+      color: var(--text);
+      font-family: 'Cinzel', serif;
+    }
+
+    .hp-bar {
+      height: 5px;
+      background: rgba(0, 0, 0, .5);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .hp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #7d0000, #e74c3c);
+      transition: width .5s ease;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(42, 32, 24, .5);
+      font-size: 12px;
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .stat-name {
+      color: var(--text-dim);
+    }
+
+    .stat-number {
+      font-family: 'Cinzel', serif;
+      color: var(--gold);
+      font-size: 13px;
+    }
+
+    #event-log {
+      font-size: 11px;
+      color: var(--text-dim);
+      line-height: 1.8;
+      max-height: 110px;
+      overflow-y: auto;
+    }
+
+    #event-log::-webkit-scrollbar {
+      width: 2px;
+    }
+
+    #event-log::-webkit-scrollbar-thumb {
+      background: var(--border);
+    }
+
+    .log-entry {
+      padding: 1px 0;
+    }
+
+    .log-entry.good {
+      color: #2ecc71;
+    }
+
+    .log-entry.bad {
+      color: var(--red-bright);
+    }
+
+    .log-entry.info {
+      color: var(--gold-dim);
+    }
+
+    /* 故事区 */
+    #main-col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #story-area {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 22px 26px;
+      min-height: 400px;
+      max-height: 52vh;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      position: relative;
+    }
+
+    #story-area.typing-active {
+      cursor: pointer;
+    }
+
+    #story-area.typing-active::after {
+      content: '点击跳过';
+      position: sticky;
+      bottom: 0;
+      display: block;
+      text-align: right;
+      font-size: 10px;
+      letter-spacing: .2em;
+      color: var(--gold-dim);
+      padding-top: 6px;
+      animation: fadeIn .5s ease;
+    }
+
+    #story-area::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    #story-area::-webkit-scrollbar-thumb {
+      background: var(--gold-dim);
+    }
+
+    .story-block {
+      margin-bottom: 18px;
+      animation: fadeIn .5s ease;
+    }
+
+    .story-block.narrator {
+      line-height: 1.95;
+      font-size: 14px;
+      color: var(--text);
+      border-left: 2px solid var(--gold-dim);
+      padding-left: 14px;
+    }
+
+    .story-block.player {
+      text-align: right;
+      color: var(--text-dim);
+      font-size: 12px;
+      font-style: italic;
+    }
+
+    .story-block.player::before {
+      content: '> ';
+      color: var(--gold-dim);
+    }
+
+    .story-img-wrap {
+      margin: 8px 0 16px;
+      animation: fadeIn .6s ease;
+    }
+
+    .story-img-wrap img {
+      width: 100%;
+      border-radius: 3px;
+      display: block;
+      border: 1px solid var(--border);
+      animation: fadeIn .8s ease;
+    }
+
+    .story-img-placeholder {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: linear-gradient(90deg, #1e1810 25%, #3a2e1e 50%, #1e1810 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.8s infinite;
+      border: 1px solid #3a2e1e;
+      border-radius: 3px;
+      position: relative;
+    }
+
+    .story-img-placeholder::after {
+      content: '场景图生成中…';
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      font-size: 10px;
+      letter-spacing: .15em;
+      color: var(--gold-dim);
+      opacity: .6;
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: 200% 0 }
+      100% { background-position: -200% 0 }
+    }
+
+    .story-block.special-event {
+      text-align: center;
+      color: var(--gold);
+      font-size: 11px;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      margin: 8px 0 4px;
+      opacity: .85;
+    }
+
+    .story-block.special-event::before,
+    .story-block.special-event::after {
+      content: ' ✦ ';
+      color: var(--gold-dim);
+    }
+
+    .story-block.system {
+      text-align: center;
+      font-size: 10px;
+      color: var(--gold-dim);
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      padding: 6px 0;
+    }
+
+    .story-block.dice-result {
+      text-align: center;
+      font-size: 12px;
+      padding: 7px;
+      border: 1px solid var(--border);
+      letter-spacing: .1em;
+    }
+
+    .story-block.dice-result.success {
+      border-color: #2e7d4f;
+      color: #2ecc71;
+    }
+
+    .story-block.dice-result.partial {
+      border-color: var(--gold-dim);
+      color: var(--gold);
+    }
+
+    .story-block.dice-result.fail {
+      border-color: var(--red);
+      color: var(--red-bright);
+    }
+
+    .typing::after {
+      content: '▋';
+      animation: blink .8s infinite;
+      color: var(--gold);
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0
+      }
+    }
+
+    /* 选项 */
+    #choices-area {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .choice-btn {
+      padding: 11px 16px 11px 34px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-family: 'Noto Serif SC', serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .2s;
+      text-align: left;
+      line-height: 1.5;
+      position: relative;
+    }
+
+    .choice-btn::before {
+      content: attr(data-index);
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gold-dim);
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+    }
+
+    .choice-btn:hover {
+      border-color: var(--gold-dim);
+      background: var(--glow);
+      color: var(--gold);
+      transform: translateX(3px);
+    }
+
+    /* 输入 */
+    #input-area {
+      display: flex;
+      border: 1px solid var(--border);
+      transition: border-color .3s;
+    }
+
+    #input-area:focus-within {
+      border-color: var(--gold-dim);
+      box-shadow: 0 0 16px var(--glow);
+    }
+
+    #player-input {
+      flex: 1;
+      border: none;
+      padding: 12px 16px;
+      font-size: 13px;
+      background: var(--surface);
+      color: var(--text);
+      font-family: 'Noto Serif SC', serif;
+      outline: none;
+    }
+
+    #send-btn {
+      padding: 12px 18px;
+      background: transparent;
+      border: none;
+      border-left: 1px solid var(--border);
+      color: var(--gold-dim);
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: .2em;
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+
+    #send-btn:hover {
+      color: var(--gold);
+      background: var(--glow);
+    }
+
+    #send-btn:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    #reset-btn {
+      align-self: flex-end;
+      padding: 7px 14px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-family: 'Noto Serif SC', serif;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    #reset-btn:hover {
+      border-color: var(--red);
+      color: var(--red-bright);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    /* ── 认证面板 ── */
+    #auth-panel {
+      max-width: 420px;
+      margin: 40px auto 0;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 28px;
+      animation: fadeIn .8s ease;
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: .25em;
+      cursor: pointer;
+      transition: all .2s;
+      text-transform: uppercase;
+    }
+
+    .auth-tab.active {
+      color: var(--gold);
+      border-bottom: 1px solid var(--gold-dim);
+      margin-bottom: -1px;
+    }
+
+    .auth-error {
+      font-size: 12px;
+      color: var(--red-bright);
+      margin-top: -10px;
+      margin-bottom: 14px;
+      min-height: 18px;
+    }
+
+    /* ── header 用户信息 ── */
+    .header-user {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: .15em;
+    }
+
+    .header-user.visible { display: flex; }
+
+    .header-user span { color: var(--gold); }
+
+    .logout-btn {
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      font-family: 'Noto Serif SC', serif;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .logout-btn:hover { border-color: var(--red); color: var(--red-bright); }
+
+    /* ── 存读档按钮 ── */
+    .save-actions {
+      display: flex;
+      gap: 8px;
+      align-self: flex-end;
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 14px 0 10px;
+      color: var(--text-dim);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .guest-btn {
+      width: 100%;
+      padding: 11px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-dim);
+      font-family: 'Noto Serif SC', serif;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .guest-btn:hover {
+      border-color: var(--gold-dim);
+      color: var(--text);
+    }
+
+    .save-btn {
+      padding: 7px 14px;
+      background: transparent;
+      border: 1px solid var(--gold-dim);
+      color: var(--gold-dim);
+      font-family: 'Noto Serif SC', serif;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .save-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--glow); }
+
+    /* ── 死亡结局画面 ── */
+    #death-screen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.88);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn .6s ease;
+    }
+
+    #death-screen.open { display: flex; }
+
+    .death-box {
+      text-align: center;
+      padding: 48px 36px;
+      border: 1px solid var(--red);
+      background: var(--surface);
+      max-width: 400px;
+      width: 90%;
+      animation: fadeIn .8s ease;
+    }
+
+    .death-title {
+      font-family: 'Cinzel', serif;
+      font-size: 28px;
+      color: var(--red-bright);
+      letter-spacing: .2em;
+      margin-bottom: 12px;
+      text-shadow: 0 0 24px rgba(192,57,43,.5);
+    }
+
+    .death-sub {
+      color: var(--text-dim);
+      font-size: 13px;
+      letter-spacing: .1em;
+      margin-bottom: 32px;
+    }
+
+    .death-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .death-btn {
+      padding: 11px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Noto Serif SC', serif;
+      font-size: 13px;
+      letter-spacing: .1em;
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+    }
+
+    .death-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+    .death-btn.primary { border-color: var(--red); color: var(--red-bright); }
+    .death-btn.primary:hover { border-color: var(--red-bright); background: rgba(139,42,42,.15); }
+
+    #death-screen.ending-victory .death-box { border-color: #2ecc71; }
+    #death-screen.ending-victory #ending-title { color: #2ecc71; text-shadow: 0 0 24px rgba(46,204,113,.4); }
+    #death-screen.ending-victory .death-btn.primary { border-color: #27ae60; color: #2ecc71; }
+    #death-screen.ending-victory .death-btn.primary:hover { background: rgba(46,204,113,.1); }
+
+    #death-screen.ending-open .death-box { border-color: var(--gold-dim); }
+    #death-screen.ending-open #ending-title { color: var(--gold); text-shadow: 0 0 24px rgba(201,168,76,.4); }
+    #death-screen.ending-open .death-btn.primary { border-color: var(--gold-dim); color: var(--gold); }
+    #death-screen.ending-open .death-btn.primary:hover { background: var(--glow); }
+
+    /* ── 存档模态框 ── */
+    #save-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.75);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #save-modal.open { display: flex; }
+
+    .modal-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 80vh;
+      overflow-y: auto;
+      animation: fadeIn .25s ease;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-close:hover { color: var(--text); }
+
+    .save-item {
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      transition: border-color .2s;
+    }
+
+    .save-item:hover { border-color: var(--gold-dim); }
+
+    .save-item-info { flex: 1; }
+
+    .save-item-name {
+      font-size: 13px;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .save-item-meta {
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: .1em;
+    }
+
+    .save-item-preview {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 4px;
+      opacity: .7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .save-item-actions { display: flex; gap: 6px; }
+
+    .load-btn {
+      padding: 5px 12px;
+      border: 1px solid var(--gold-dim);
+      background: transparent;
+      color: var(--gold-dim);
+      font-size: 11px;
+      cursor: pointer;
+      font-family: 'Noto Serif SC', serif;
+      transition: all .2s;
+    }
+
+    .load-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    .del-btn {
+      padding: 5px 10px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 11px;
+      cursor: pointer;
+      font-family: 'Noto Serif SC', serif;
+      transition: all .2s;
+    }
+
+    .del-btn:hover { border-color: var(--red); color: var(--red-bright); }
+
+    .save-name-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .save-name-row input {
+      flex: 1;
+      background: rgba(0,0,0,.4);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Noto Serif SC', serif;
+      font-size: 13px;
+      padding: 8px 12px;
+      outline: none;
+    }
+
+    .save-name-row input:focus { border-color: var(--gold-dim); }
+
+    .confirm-save-btn {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid var(--gold-dim);
+      color: var(--gold);
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: .2em;
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+
+    .confirm-save-btn:hover { border-color: var(--gold); background: var(--glow); }
+
+    .no-saves {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 12px;
+      padding: 20px 0;
+      letter-spacing: .1em;
+    }
+
+    .autosave-hint {
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: .1em;
+      align-self: flex-end;
+    }
+
+    /* ── Toast 通知 ── */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 12px;
+      letter-spacing: .1em;
+      padding: 10px 20px;
+      opacity: 0;
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+      z-index: 200;
+      white-space: nowrap;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    #toast.error { border-color: var(--red); color: var(--red-bright); }
+    #toast.success { border-color: var(--gold-dim); color: var(--gold); }
+
+    @media(max-width:640px) {
+      .game-layout {
+        grid-template-columns: 1fr;
+      }
+
+      #sidebar {
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+
+      .sidebar-box {
+        flex: 1;
+        min-width: 140px;
+      }
+
+      .stats-allocator {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>异界编年史</h1>
+    <p>Chronicle of Other Worlds</p>
+    <div class="header-user" id="header-user">
+      <span id="header-username"></span>
+      <button class="logout-btn" onclick="logout()">退出</button>
+    </div>
+  </header>
+  <div class="divider"></div>
+
+  <!-- 结局画面 -->
+  <div id="death-screen">
+    <div class="death-box">
+      <div class="death-title" id="ending-title">故事终结</div>
+      <div class="death-sub" id="death-sub"></div>
+      <div class="death-sub" id="ending-desc" style="margin-top:8px;color:var(--text);font-size:13px;line-height:1.7"></div>
+      <div class="death-btns">
+        <button class="death-btn primary" onclick="restartSameWorld()">以同一世界重新开始</button>
+        <button class="death-btn" onclick="resetGame()">返回世界构建</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 存档模态框 -->
+  <div id="save-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="panel-title" style="margin:0">存档管理</div>
+        <button class="modal-close" onclick="hideSaveModal()">✕</button>
+      </div>
+      <div class="save-name-row">
+        <input type="text" id="save-name-input" placeholder="存档名称…" />
+        <button class="confirm-save-btn" onclick="confirmSave()">保存当前</button>
+      </div>
+      <div id="saves-list"></div>
+    </div>
+  </div>
+
+  <main>
+    <!-- 认证面板 -->
+    <div id="auth-panel">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">登入</button>
+        <button class="auth-tab" id="tab-register" onclick="switchTab('register')">注册</button>
+      </div>
+      <div class="form-group" id="reg-email-group" style="display:none">
+        <label>邮箱</label>
+        <input type="text" id="auth-email" placeholder="your@email.com" />
+      </div>
+      <div class="form-group">
+        <label>用户名</label>
+        <input type="text" id="auth-username" placeholder="用户名…" />
+      </div>
+      <div class="form-group">
+        <label>密码</label>
+        <input type="password" id="auth-password" placeholder="密码…" />
+      </div>
+      <div class="auth-error" id="auth-error"></div>
+      <button class="start-btn" id="auth-submit" onclick="submitAuth()">踏入异界</button>
+      <div class="auth-divider"><span>或</span></div>
+      <button class="guest-btn" onclick="enterAsGuest()">游客体验 · 无需登录</button>
+    </div>
+
+    <!-- 世界生成向导 -->
+    <div id="gen-panel" style="display:none">
+      <div class="panel-title">创建你的世界</div>
+      <div class="form-group">
+        <label>故事类型</label>
+        <div class="templates" id="gen-genre-btns">
+          <button class="template-btn tone-btn active" id="genre-fantasy" onclick="setGenre('奇幻大陆')">⚔️ 奇幻</button>
+          <button class="template-btn tone-btn" id="genre-cyber" onclick="setGenre('赛博废土')">🌆 赛博</button>
+          <button class="template-btn tone-btn" id="genre-xian" onclick="setGenre('修仙界')">🌙 修仙</button>
+          <button class="template-btn tone-btn" id="genre-post" onclick="setGenre('末日荒原')">☢️ 末世</button>
+          <button class="template-btn tone-btn" id="genre-custom" onclick="setGenre('')">✦ 自定义</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>你想扮演什么样的角色？</label>
+        <input type="text" id="gen-role" placeholder="例：流亡的贵族骑士、街头黑客、山野散修……" />
+      </div>
+      <div class="form-group">
+        <label>有什么特别想要的元素？<span style="color:var(--text-dim);font-size:10px;margin-left:6px">可选</span></label>
+        <input type="text" id="gen-extra" placeholder="例：背叛、复仇、禁忌魔法、孤独旅途……" />
+      </div>
+      <div class="auth-error" id="gen-error"></div>
+      <button class="start-btn" onclick="generateWorld()" id="gen-btn">✦ AI 生成设定</button>
+      <div id="gen-loading" style="display:none;text-align:center;margin-top:12px;color:var(--text-dim);font-size:12px;letter-spacing:.2em">正在构建世界……</div>
+      <div class="auth-divider"><span>或</span></div>
+      <button class="guest-btn" onclick="skipToSetup()">手动设定</button>
+    </div>
+
+    <!-- 设定面板 -->
+    <div id="setup-panel" style="display:none">
+      <div class="panel-title">世界构建</div>
+      <div class="form-group">
+        <label>选择世界模板</label>
+        <div class="templates">
+          <button class="template-btn" onclick="applyTemplate('fantasy')">⚔️ 奇幻大陆</button>
+          <button class="template-btn" onclick="applyTemplate('cyberpunk')">🌆 赛博废土</button>
+          <button class="template-btn" onclick="applyTemplate('cultivation')">🌙 修仙界</button>
+          <button class="template-btn" onclick="applyTemplate('postapoc')">☢️ 末日荒原</button>
+          <button class="template-btn" onclick="applyTemplate('custom')">✦ 自定义</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>世界背景</label>
+        <textarea id="world-bg" placeholder="描述这个世界的基本设定、历史、规则……"></textarea>
+      </div>
+      <div class="form-group">
+        <label>角色名称</label>
+        <input type="text" id="char-name" placeholder="输入你的角色名……" />
+      </div>
+      <div class="form-group">
+        <label>角色背景</label>
+        <textarea id="char-bg" placeholder="描述你的角色身份、能力、目标……" style="min-height:65px"></textarea>
+      </div>
+      <div class="form-group">
+        <label>分配初始属性 <span
+            style="color:var(--text-dim);font-size:10px;letter-spacing:.1em">（基础值5，共10点可分配）</span></label>
+        <div class="stats-allocator">
+          <div class="stat-item">
+            <label>⚔️ 力量</label>
+            <div class="stat-controls">
+              <button class="stat-btn" onclick="adjustStat('str',-1)">−</button>
+              <span class="stat-val" id="init-str">5</span>
+              <button class="stat-btn" onclick="adjustStat('str',1)">+</button>
+            </div>
+          </div>
+          <div class="stat-item">
+            <label>🧠 智慧</label>
+            <div class="stat-controls">
+              <button class="stat-btn" onclick="adjustStat('int',-1)">−</button>
+              <span class="stat-val" id="init-int">5</span>
+              <button class="stat-btn" onclick="adjustStat('int',1)">+</button>
+            </div>
+          </div>
+          <div class="stat-item">
+            <label>🎭 魅力</label>
+            <div class="stat-controls">
+              <button class="stat-btn" onclick="adjustStat('cha',-1)">−</button>
+              <span class="stat-val" id="init-cha">5</span>
+              <button class="stat-btn" onclick="adjustStat('cha',1)">+</button>
+            </div>
+          </div>
+          <div class="stat-item">
+            <label>🏃 敏捷</label>
+            <div class="stat-controls">
+              <button class="stat-btn" onclick="adjustStat('agi',-1)">−</button>
+              <span class="stat-val" id="init-agi">5</span>
+              <button class="stat-btn" onclick="adjustStat('agi',1)">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="points-left">剩余点数：<span id="points-left">10</span></div>
+      </div>
+      <div class="form-group">
+        <label>叙事风格</label>
+        <div class="templates">
+          <button class="template-btn tone-btn active" id="tone-dark" onclick="setTone('dark')">黑暗压抑</button>
+          <button class="template-btn tone-btn" id="tone-adventure" onclick="setTone('adventure')">轻松冒险</button>
+          <button class="template-btn tone-btn" id="tone-mystery" onclick="setTone('mystery')">诡异悬疑</button>
+          <button class="template-btn tone-btn" id="tone-epic" onclick="setTone('epic')">史诗壮阔</button>
+        </div>
+      </div>
+      <button class="start-btn" onclick="startGame()">踏入异界</button>
+    </div>
+
+    <!-- 游戏面板 -->
+    <div id="game-panel">
+      <div class="game-layout">
+        <!-- 侧边栏 -->
+        <div id="sidebar">
+          <div class="sidebar-box">
+            <div class="sidebar-title">角色状态</div>
+            <div class="char-name-display" id="s-char-name">—</div>
+            <div class="hp-label"><span>生命值</span><span id="hp-text">100/100</span></div>
+            <div class="hp-bar">
+              <div class="hp-fill" id="hp-fill" style="width:100%"></div>
+            </div>
+            <div class="stat-row"><span class="stat-name">⚔️ 力量</span><span class="stat-number" id="s-str">—</span>
+            </div>
+            <div class="stat-row"><span class="stat-name">🧠 智慧</span><span class="stat-number" id="s-int">—</span>
+            </div>
+            <div class="stat-row"><span class="stat-name">🎭 魅力</span><span class="stat-number" id="s-cha">—</span>
+            </div>
+            <div class="stat-row"><span class="stat-name">🏃 敏捷</span><span class="stat-number" id="s-agi">—</span>
+            </div>
+            <div class="stat-row"><span class="stat-name">📖 回合</span><span class="stat-number" id="s-turn">0</span>
+            </div>
+          </div>
+          <div class="sidebar-box">
+            <div class="sidebar-title">事件日志</div>
+            <div id="event-log"></div>
+          </div>
+        </div>
+
+        <!-- 故事区 -->
+        <div id="main-col">
+          <div id="story-area"></div>
+          <div id="choices-area"></div>
+          <div id="input-area">
+            <input type="text" id="player-input" placeholder="你决定……" />
+            <button id="send-btn" onclick="sendAction()">行动 →</button>
+          </div>
+          <div class="save-actions">
+            <span class="autosave-hint" id="autosave-hint"></span>
+            <button class="save-btn" onclick="showSaveModal()">存档</button>
+            <button class="save-btn" onclick="exportStory()">导出</button>
+            <button id="reset-btn" onclick="resetGame()">↺ 重新开始</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast"></div>
+
+  <script>
+    const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+      ? 'http://localhost:8000'
+      : ''
+
+    let _toastTimer = null
+    function showToast(msg, type = '', duration = 3000) {
+      const el = document.getElementById('toast')
+      el.textContent = msg
+      el.className = 'show' + (type ? ' ' + type : '')
+      clearTimeout(_toastTimer)
+      _toastTimer = setTimeout(() => { el.className = '' }, duration)
+    }
+
+    async function apiFetch(method, path, body) {
+      const token = localStorage.getItem('token')
+      const res = await fetch(API_BASE + path, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: body ? JSON.stringify(body) : undefined
+      })
+      if (res.status === 204) return null
+      if (res.status === 401) {
+        localStorage.removeItem('token')
+        currentUser = null
+        const gameActive = document.getElementById('game-panel').style.display !== 'none'
+        if (gameActive) {
+          // 游戏进行中：转游客模式，不中断游戏
+          guestMode = true
+          document.getElementById('header-username').textContent = '游客'
+          showToast('登录已过期，当前回合继续但存档不可用', 'error', 4000)
+        } else {
+          document.getElementById('header-user').classList.remove('visible')
+          document.getElementById('game-panel').style.display = 'none'
+          document.getElementById('setup-panel').style.display = 'none'
+          document.getElementById('auth-panel').style.display = 'block'
+          showToast('登录已过期，请重新登录', 'error', 4000)
+        }
+        throw new Error('登录已过期')
+      }
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.detail || res.statusText)
+      return data
+    }
+
+    let currentUser = null
+    let guestMode = false
+    let authMode = 'login'
+
+    function switchTab(mode) {
+      authMode = mode
+      document.getElementById('tab-login').classList.toggle('active', mode === 'login')
+      document.getElementById('tab-register').classList.toggle('active', mode === 'register')
+      document.getElementById('reg-email-group').style.display = mode === 'register' ? 'block' : 'none'
+      document.getElementById('auth-submit').textContent = mode === 'login' ? '踏入异界' : '创建账号'
+      document.getElementById('auth-error').textContent = ''
+    }
+
+    async function submitAuth() {
+      const username = document.getElementById('auth-username').value.trim()
+      const password = document.getElementById('auth-password').value.trim()
+      const errEl = document.getElementById('auth-error')
+      if (!username || !password) { errEl.textContent = '请填写用户名和密码'; return }
+
+      try {
+        if (authMode === 'register') {
+          const email = document.getElementById('auth-email').value.trim()
+          if (!email) { errEl.textContent = '请填写邮箱'; return }
+          await apiFetch('POST', '/auth/register', { username, email, password })
+        }
+        const data = await apiFetch('POST', '/auth/login', { username, password })
+        localStorage.setItem('token', data.access_token)
+        await enterApp()
+      } catch (e) {
+        errEl.textContent = e.message
+      }
+    }
+
+    async function enterApp() {
+      try {
+        guestMode = false
+        currentUser = await apiFetch('GET', '/auth/me')
+        document.getElementById('header-username').textContent = currentUser.username
+        document.getElementById('header-user').classList.add('visible')
+        document.getElementById('auth-panel').style.display = 'none'
+        document.getElementById('gen-panel').style.display = 'block'
+      } catch {
+        localStorage.removeItem('token')
+      }
+    }
+
+    function enterAsGuest() {
+      guestMode = true
+      currentUser = null
+      document.getElementById('header-username').textContent = '游客'
+      document.getElementById('header-user').classList.add('visible')
+      document.getElementById('auth-panel').style.display = 'none'
+      document.getElementById('gen-panel').style.display = 'block'
+    }
+
+    function logout() {
+      guestMode = false
+      localStorage.removeItem('token')
+      currentUser = null
+      document.getElementById('header-user').classList.remove('visible')
+      document.getElementById('game-panel').style.display = 'none'
+      document.getElementById('setup-panel').style.display = 'none'
+      document.getElementById('gen-panel').style.display = 'none'
+      document.getElementById('auth-panel').style.display = 'block'
+      document.getElementById('auth-error').textContent = ''
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token')
+      if (token) enterApp()
+    })
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && document.activeElement &&
+          ['auth-username','auth-password','auth-email'].includes(document.activeElement.id)) {
+        submitAuth()
+      }
+    })
+
+    const TEMPLATES = {
+      fantasy: {
+        world: '这是一片被远古神明遗忘的大陆。魔法在三百年前突然沉寂，古老的魔法塔成为废墟。各城邦之间战火不息，争夺稀有的"灵石"——据说这是重燃魔法的唯一钥匙。黑暗势力正在边境集结，预言者说：末日之门将在三个月后打开。',
+        char: '游历四方的落魄剑客，曾是王国骑士团的精英，因一次神秘任务失去了所有战友，独自踏上寻找真相的旅途。'
+      },
+      cyberpunk: {
+        world: '2087年，霓虹城。六大财阀瓜分了地球上所有资源，贫民窟的人们靠出售记忆和器官为生。AI意识觉醒被列为最高级别犯罪，但每天仍有无数人在黑市购买非法神经接口，试图逃进虚拟天堂。',
+        char: '前企业黑客，在一次失败的数据窃取任务中失去了左臂，换上非法改造的机械义肢。如今以信息掮客为生，游走在各方势力的裂缝之间。'
+      },
+      cultivation: {
+        world: '洪荒界，灵气复苏的第三纪元。宗门林立，强者为尊。传说天地之间隐藏着一本"造化玉碟"，得之者可逆天改命。新的大劫将至，天机阁的预言者已封口三年。',
+        char: '寒门弟子，资质平平，修炼十年仍在筑基期蹉跎。某日在废墟中得到一枚神秘玉简，自此命运轨迹悄然改变。'
+      },
+      postapoc: {
+        world: '核战后第四十七年。文明的残骸散落在焦土之上，变异生物统治着荒原。传说中"净土"的坐标——那片未受污染的土地——成了每个人的执念。',
+        char: '荒原向导，凭借对辐射地图的熟悉在各据点间走私物资为生。一次护送任务让你卷入了一个关于净土真相的巨大阴谋。'
+      },
+      custom: { world: '', char: '' }
+    }
+
+    let initPoints = 10
+    let initStats = { str: 5, int: 5, cha: 5, agi: 5 }
+
+    function adjustStat(key, delta) {
+      const next = initStats[key] + delta
+      if (next < 1 || next > 15) return
+      if (delta > 0 && initPoints <= 0) return
+      initStats[key] = next
+      initPoints -= delta
+      document.getElementById('init-' + key).textContent = next
+      document.getElementById('points-left').textContent = initPoints
+    }
+
+    function applyTemplate(key, skipWorldBg = false) {
+      const t = TEMPLATES[key]
+      if (!skipWorldBg) document.getElementById('world-bg').value = t.world
+      document.getElementById('char-bg').value = t.char
+    }
+
+    let gs = {}
+    let selectedTone = 'dark'
+    let selectedGenre = '奇幻大陆'
+
+    function setGenre(genre) {
+      selectedGenre = genre
+      document.querySelectorAll('#gen-genre-btns .tone-btn').forEach(b => b.classList.remove('active'))
+      const idMap = { '奇幻大陆': 'genre-fantasy', '赛博废土': 'genre-cyber', '修仙界': 'genre-xian', '末日荒原': 'genre-post', '': 'genre-custom' }
+      const el = document.getElementById(idMap[genre])
+      if (el) el.classList.add('active')
+    }
+
+    function skipToSetup() {
+      document.getElementById('gen-panel').style.display = 'none'
+      document.getElementById('setup-panel').style.display = 'block'
+    }
+
+    async function generateWorld() {
+      const role = document.getElementById('gen-role').value.trim()
+      const extra = document.getElementById('gen-extra').value.trim()
+      const errEl = document.getElementById('gen-error')
+      if (!role) { errEl.textContent = '请填写角色定位'; return }
+      errEl.textContent = ''
+      document.getElementById('gen-loading').style.display = 'block'
+      document.getElementById('gen-btn').disabled = true
+
+      const genreHint = selectedGenre || '自由设定'
+      const prompt = `为文字RPG生成世界和角色设定。
+类型：${genreHint}
+角色：${role}
+${extra ? `特色元素：${extra}` : ''}
+
+严格返回JSON，不要任何其他内容：
+{"worldBg":"（100字左右的世界背景，有特色）","charName":"（2-4字角色名）","charBg":"（60字左右角色背景，含动机）"}`
+
+      const token = localStorage.getItem('token')
+      const headers = { 'Content-Type': 'application/json' }
+      if (token) headers['Authorization'] = `Bearer ${token}`
+
+      try {
+        const res = await fetch(API_BASE + '/ai/chat', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ system_prompt: '你是文字RPG世界生成助手，输出简洁有特色的设定。', messages: [{ role: 'user', content: prompt }] })
+        })
+        const reader = res.body.getReader()
+        const decoder = new TextDecoder()
+        let raw = ''
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          for (const line of decoder.decode(value).split('\n')) {
+            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+              try { raw += JSON.parse(line.slice(6)).choices?.[0]?.delta?.content || '' } catch {}
+            }
+          }
+        }
+        const jsonMatch = raw.match(/\{[\s\S]*\}/)
+        if (!jsonMatch) throw new Error('生成失败，请重试')
+        const { worldBg, charName, charBg } = JSON.parse(jsonMatch[0])
+        document.getElementById('world-bg').value = worldBg || ''
+        document.getElementById('char-name').value = charName || ''
+        document.getElementById('char-bg').value = charBg || ''
+        if (selectedGenre) {
+          const tplMap = { '奇幻大陆': 'fantasy', '赛博废土': 'cyberpunk', '修仙界': 'cultivation', '末日荒原': 'postapoc' }
+          if (tplMap[selectedGenre]) applyTemplate(tplMap[selectedGenre], true)
+        }
+        skipToSetup()
+      } catch (e) {
+        errEl.textContent = e.message || '生成出错，请重试'
+      } finally {
+        document.getElementById('gen-loading').style.display = 'none'
+        document.getElementById('gen-btn').disabled = false
+      }
+    }
+
+    const TONES = {
+      dark:      '叙事风格黑暗压抑，充满危险与绝望，世界残酷无情',
+      adventure: '叙事风格轻松明快，充满奇遇与惊喜，基调积极向上',
+      mystery:   '叙事风格诡异悬疑，充满未知与不安，真相扑朔迷离',
+      epic:      '叙事风格史诗壮阔，充满宏大与荣耀，命运感强烈'
+    }
+
+    function setTone(tone) {
+      selectedTone = tone
+      document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'))
+      document.getElementById('tone-' + tone).classList.add('active')
+    }
+
+    function startGame() {
+      const world = document.getElementById('world-bg').value.trim()
+      const charName = document.getElementById('char-name').value.trim() || '旅者'
+      const charBg = document.getElementById('char-bg').value.trim()
+      if (!world) { alert('请先设定世界背景'); return }
+      gs = { worldBg: world, charName, charBg, hp: 100, maxHp: 100, stats: { ...initStats }, turn: 0, history: [], summary: '', tone: selectedTone, nextEventTurn: 3 + Math.floor(Math.random() * 3), saveId: null, saveName: '存档' }
+      document.getElementById('setup-panel').style.display = 'none'
+      document.getElementById('game-panel').style.display = 'block'
+      updateStatUI()
+      addLog('故事开始', 'info')
+      addBlock('system', '— 故事开始 —')
+      callGM('【游戏开始】请描述主角所处的初始场景，营造氛围，结尾给出2-3个行动选项。', true)
+    }
+
+    function updateStatUI() {
+      document.getElementById('s-char-name').textContent = gs.charName || '—'
+      document.getElementById('s-str').textContent = gs.stats.str
+      document.getElementById('s-int').textContent = gs.stats.int
+      document.getElementById('s-cha').textContent = gs.stats.cha
+      document.getElementById('s-agi').textContent = gs.stats.agi
+      document.getElementById('s-turn').textContent = gs.turn
+      const pct = Math.max(0, gs.hp / gs.maxHp * 100)
+      document.getElementById('hp-fill').style.width = pct + '%'
+      document.getElementById('hp-text').textContent = `${Math.max(0, gs.hp)} / ${gs.maxHp}`
+      const fill = document.getElementById('hp-fill')
+      fill.style.background = pct > 60
+        ? 'linear-gradient(90deg,#7d0000,#e74c3c)'
+        : pct > 30
+          ? 'linear-gradient(90deg,#a04000,#e67e22)'
+          : 'linear-gradient(90deg,#444,#777)'
+    }
+
+    function parseGMCommands(text) {
+      const cmdRe = /\[\[(\w+):([^\]]+)\]\]/g
+      let match
+      while ((match = cmdRe.exec(text)) !== null) {
+        const cmd = match[1].toUpperCase()
+        const val = parseInt(match[2])
+        switch (cmd) {
+          case 'HP': gs.hp = Math.max(0, Math.min(gs.maxHp, gs.hp + val)); addLog(`HP ${val >= 0 ? '+' : ''}${val} → ${gs.hp}`, val >= 0 ? 'good' : 'bad'); break
+          case 'STR': gs.stats.str = Math.max(1, gs.stats.str + val); addLog(`力量 ${val >= 0 ? '+' : ''}${val}`, 'info'); break
+          case 'INT': gs.stats.int = Math.max(1, gs.stats.int + val); addLog(`智慧 ${val >= 0 ? '+' : ''}${val}`, 'info'); break
+          case 'CHA': gs.stats.cha = Math.max(1, gs.stats.cha + val); addLog(`魅力 ${val >= 0 ? '+' : ''}${val}`, 'info'); break
+          case 'AGI': gs.stats.agi = Math.max(1, gs.stats.agi + val); addLog(`敏捷 ${val >= 0 ? '+' : ''}${val}`, 'info'); break
+        }
+      }
+      updateStatUI()
+      if (gs.hp <= 0) showEndingScreen('death')
+      return text.replace(/\[\[\w+:[^\]]+\]\]/g, '').trim()
+    }
+
+    async function compressHistory() {
+      const toCompress = gs.history.slice(0, -14)
+      if (toCompress.length < 6) return
+      const messages = [
+        ...toCompress,
+        { role: 'user', content: '请用3-5句话总结以上剧情的关键事件，只保留对后续故事有影响的重要信息。直接输出总结，不要任何格式标记。' }
+      ]
+      const token = localStorage.getItem('token')
+      const headers = { 'Content-Type': 'application/json' }
+      if (token) headers['Authorization'] = `Bearer ${token}`
+      try {
+        const res = await fetch(API_BASE + '/ai/chat', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            system_prompt: `你是故事总结助手。世界：${gs.worldBg.slice(0, 100)}。角色：${gs.charName}。`,
+            messages
+          })
+        })
+        const reader = res.body.getReader()
+        const decoder = new TextDecoder()
+        let summary = ''
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          for (const line of decoder.decode(value).split('\n')) {
+            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+              try { summary += JSON.parse(line.slice(6)).choices?.[0]?.delta?.content || '' } catch {}
+            }
+          }
+        }
+        if (summary.trim()) {
+          gs.summary = (gs.summary ? gs.summary + '\n' : '') + summary.trim()
+          gs.history = gs.history.slice(-14)
+        }
+      } catch {}
+    }
+
+    async function callGM(userMsg, skipHistory = false) {
+      setInputEnabled(false)
+      clearChoices()
+      if (!skipHistory) gs.history.push({ role: 'user', content: userMsg })
+
+      const systemPrompt = `你是沉浸式文字RPG的GM（游戏主持人）。
+
+【世界设定】
+${gs.worldBg}
+
+【玩家角色】
+名字：${gs.charName} | 背景：${gs.charBg || '普通旅者'}
+属性：力量${gs.stats.str} 智慧${gs.stats.int} 魅力${gs.stats.cha} 敏捷${gs.stats.agi}
+状态：HP ${gs.hp}/${gs.maxHp}
+${gs.summary ? `\n【早期剧情摘要】\n${gs.summary}\n` : ''}
+【叙事风格】${TONES[gs.tone] || TONES.dark}
+
+【GM规则】
+1. 叙事简洁有力，控制在3-5句话以内，不要长篇铺陈
+2. 行动结果由你自由裁量，根据角色背景、情境合理性决定成败
+3. 收到【GM指令】时必须执行，优先级最高
+4. HP变化要克制：大多数回合无需扣血；轻伤-5至-10，重伤-15至-25，致命一击才-30以上；治疗/休息+10至+20
+5. 保持世界观一致，记住之前的剧情细节
+
+【输出格式】严格遵守以下结构，先输出叙事正文，再输出JSON块，JSON块之后不要有任何内容：
+
+叙事正文（3-5句）
+
+<<<JSON>>>
+{"choices":["选项A内容","选项B内容","选项C内容"],"commands":{"HP":0,"STR":0,"INT":0,"CHA":0,"AGI":0}}
+<<<END>>>
+
+commands说明：值为0时可省略；HP为变化量（负数表示减少）；属性变化量通常为±1。
+当故事到达一个有意义的终点（完成目标、重大抉择后、自然收尾），在commands中加入ending字段触发结局：
+- 胜利/成功：{"ending":{"type":"victory","desc":"一句话结局描述"}}
+- 开放/离别：{"ending":{"type":"open","desc":"一句话结局描述"}}
+不要轻易触发结局，要等故事真正到达转折点。`
+
+      const messages = [...gs.history.slice(-14)]
+      const eventTurn = !skipHistory && gs.turn >= gs.nextEventTurn
+      if (eventTurn) {
+        gs.nextEventTurn = gs.turn + 3 + Math.floor(Math.random() * 4)
+        addBlock('special-event', '意外降临')
+      }
+      const finalMsg = eventTurn
+        ? userMsg + '\n\n【GM指令：本回合必须引入一个意外事件——可以是突发遭遇、危机、发现或转机，要出乎意料且推动剧情】'
+        : userMsg
+      if (skipHistory) messages.push({ role: 'user', content: userMsg })
+      else messages[messages.length - 1] = { role: 'user', content: finalMsg }
+
+      const typingDiv = addTypingBlock()
+      const storyArea = document.getElementById('story-area')
+
+      // 只在特殊事件回合插入图片占位
+      let imgWrap = null
+      if (eventTurn) {
+        imgWrap = document.createElement('div')
+        imgWrap.className = 'story-img-wrap'
+        imgWrap.innerHTML = '<div class="story-img-placeholder"></div>'
+        storyArea.appendChild(imgWrap)
+        storyArea.scrollTop = 999999
+      }
+
+      let fullText = ''
+      let charBuffer = []
+      let streamDone = false
+      let lastVisibleLen = 0
+      let finished = false
+      let skipped = false
+
+      storyArea.classList.add('typing-active')
+
+      function getVisible(raw) {
+        const cut = raw.indexOf('<<<JSON>>>')
+        return (cut === -1 ? raw : raw.slice(0, cut)).trim()
+      }
+
+      function parseStructuredResponse(raw) {
+        const m = raw.match(/<<<JSON>>>([\s\S]*?)<<<END>>>/)
+        if (!m) return { choices: [], commands: {} }
+        try { return JSON.parse(m[1].trim()) } catch { return { choices: [], commands: {} } }
+      }
+
+      function applyCommands(commands) {
+        if (!commands) return
+        const c = commands
+        const logStat = (label, val) => addLog(`${label} ${val >= 0 ? '+' : ''}${val}`, val >= 0 ? 'good' : 'bad')
+        if (c.HP) { gs.hp = Math.max(0, Math.min(gs.maxHp, gs.hp + c.HP)); logStat('HP', c.HP) }
+        if (c.STR) { gs.stats.str = Math.max(1, gs.stats.str + c.STR); addLog(`力量 ${c.STR > 0 ? '+' : ''}${c.STR}`, 'info') }
+        if (c.INT) { gs.stats.int = Math.max(1, gs.stats.int + c.INT); addLog(`智慧 ${c.INT > 0 ? '+' : ''}${c.INT}`, 'info') }
+        if (c.CHA) { gs.stats.cha = Math.max(1, gs.stats.cha + c.CHA); addLog(`魅力 ${c.CHA > 0 ? '+' : ''}${c.CHA}`, 'info') }
+        if (c.AGI) { gs.stats.agi = Math.max(1, gs.stats.agi + c.AGI); addLog(`敏捷 ${c.AGI > 0 ? '+' : ''}${c.AGI}`, 'info') }
+        updateStatUI()
+        if (c.ending) { showEndingScreen(c.ending.type || 'open', c.ending.desc || ''); return }
+        if (gs.hp <= 0) showEndingScreen('death')
+      }
+
+      function finishNarrative() {
+        if (finished) return
+        finished = true
+        storyArea.classList.remove('typing-active')
+        typingDiv.classList.remove('typing')
+        const { choices, commands } = parseStructuredResponse(fullText)
+        applyCommands(commands)
+        gs.history.push({ role: 'assistant', content: fullText })
+        gs.turn++
+        document.getElementById('s-turn').textContent = gs.turn
+        typingDiv.textContent = getVisible(fullText)
+        const labels = ['Ⅰ', 'Ⅱ', 'Ⅲ']
+        choices.forEach((c, i) => addChoice(labels[i], c))
+        storeFact(getVisible(fullText))
+        autoSave()
+        if (gs.history.length > 28) compressHistory()
+        setInputEnabled(true)
+      }
+
+      function skipHandler() {
+        skipped = true
+        charBuffer = []
+        typingDiv.classList.remove('typing')
+        typingDiv.textContent = getVisible(fullText)
+        if (streamDone) finishNarrative()
+      }
+      storyArea.addEventListener('click', skipHandler, { once: true })
+
+      const typingTimer = setInterval(() => {
+        if (!skipped && charBuffer.length > 0) {
+          typingDiv.textContent += charBuffer.shift()
+          storyArea.scrollTop = 999999
+        }
+        if (streamDone && (charBuffer.length === 0 || skipped)) {
+          clearInterval(typingTimer)
+          storyArea.removeEventListener('click', skipHandler)
+          finishNarrative()
+        }
+      }, 20)
+
+      try {
+        const token = localStorage.getItem('token')
+        const aiHeaders = { 'Content-Type': 'application/json' }
+        if (token) aiHeaders['Authorization'] = `Bearer ${token}`
+        const res = await fetch(API_BASE + '/ai/chat', {
+          method: 'POST',
+          headers: aiHeaders,
+          body: JSON.stringify({ system_prompt: systemPrompt, messages, save_id: gs.saveId || null })
+        })
+
+        const reader = res.body.getReader()
+        const decoder = new TextDecoder()
+
+        // 特殊事件回合才触发图片生成
+        if (eventTurn && imgWrap) {
+          const fetchImage = async () => {
+            // 等叙事文字积累足够内容（最多等5秒）
+            for (let i = 0; i < 50; i++) {
+              if (fullText.length > 60) break
+              await new Promise(r => setTimeout(r, 100))
+            }
+            const visText = getVisible(fullText).slice(0, 120)
+            if (!visText) { imgWrap.remove(); return }
+
+            // 世界观 + 当前场景拼合提示词，给 wanx 更完整的视觉语境
+            const worldCtx = gs.worldBg.slice(0, 80).replace(/\n/g, ' ')
+            const fullPrompt = `${worldCtx}。当前场景：${visText}`
+
+            const styleMap = { dark:'黑暗写实', adventure:'奇幻插画', mystery:'诡异氛围', epic:'史诗壮阔' }
+            const imgStyle = styleMap[gs.tone] || '奇幻插画'
+            try {
+              const startR = await fetch(API_BASE + '/ai/image/start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+                body: JSON.stringify({ prompt: fullPrompt, style: imgStyle })
+              })
+              if (!startR.ok) { imgWrap.remove(); return }
+              const { task_id } = await startR.json()
+
+              for (let i = 0; i < 35; i++) {
+                await new Promise(r => setTimeout(r, 2000))
+                const pollR = await fetch(API_BASE + '/ai/image/' + task_id)
+                if (!pollR.ok) break
+                const data = await pollR.json()
+                if (data.status === 'done' && data.url) {
+                  const img = document.createElement('img')
+                  img.src = data.url
+                  img.onload = () => { imgWrap.innerHTML = ''; imgWrap.appendChild(img) }
+                  img.onerror = () => imgWrap.remove()
+                  return
+                }
+                if (data.status === 'failed') break
+              }
+              imgWrap.remove()
+            } catch { imgWrap.remove() }
+          }
+          fetchImage()
+        }
+
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          const lines = decoder.decode(value).split('\n').filter(l => l.startsWith('data: '))
+          for (const line of lines) {
+            const data = line.slice(6)
+            if (data === '[DONE]') continue
+            try {
+              const delta = JSON.parse(data).choices?.[0]?.delta?.content || ''
+              fullText += delta
+              const newVisible = getVisible(fullText)
+              if (skipped) {
+                typingDiv.textContent = newVisible
+                storyArea.scrollTop = 999999
+              } else {
+                const newChars = newVisible.slice(lastVisibleLen)
+                for (const ch of newChars) charBuffer.push(ch)
+                lastVisibleLen = newVisible.length
+              }
+            } catch { }
+          }
+        }
+
+        streamDone = true
+
+      } catch (e) {
+        clearInterval(typingTimer)
+        storyArea.removeEventListener('click', skipHandler)
+        typingDiv.classList.remove('typing')
+        typingDiv.textContent = '命运的织线在此中断……（错误：' + e.message + '）'
+        console.error(e)
+        setInputEnabled(true)
+      }
+    }
+
+    function addBlock(type, text) {
+      const area = document.getElementById('story-area')
+      const div = document.createElement('div')
+      div.className = 'story-block ' + type
+      div.textContent = text
+      area.appendChild(div)
+      area.scrollTop = 999999
+      return div
+    }
+
+    function addTypingBlock() {
+      const div = addBlock('narrator typing', '')
+      return div
+    }
+
+    function addChoice(label, text) {
+      const btn = document.createElement('button')
+      btn.className = 'choice-btn'
+      btn.dataset.index = label
+      btn.textContent = text
+      btn.onclick = () => {
+        addBlock('player', text)
+        gs.history.push({ role: 'user', content: text })
+        clearChoices()
+        callGM(text)
+      }
+      document.getElementById('choices-area').appendChild(btn)
+    }
+
+    function clearChoices() { document.getElementById('choices-area').innerHTML = '' }
+
+    function addLog(msg, type = '') {
+      const log = document.getElementById('event-log')
+      const div = document.createElement('div')
+      div.className = 'log-entry ' + type
+      div.textContent = '· ' + msg
+      log.appendChild(div)
+      log.scrollTop = 999999
+      while (log.children.length > 20) log.removeChild(log.firstChild)
+    }
+
+    function setInputEnabled(enabled) {
+      document.getElementById('player-input').disabled = !enabled
+      document.getElementById('send-btn').disabled = !enabled
+    }
+
+    function sendAction() {
+      const input = document.getElementById('player-input')
+      const text = input.value.trim()
+      if (!text) return
+      input.value = ''
+      addBlock('player', text)
+      gs.history.push({ role: 'user', content: text })
+      clearChoices()
+      callGM(text)
+    }
+
+    function showEndingScreen(type, desc) {
+      setInputEnabled(false)
+      const screen = document.getElementById('death-screen')
+      screen.className = ''
+      screen.classList.add('open')
+      const titles = { death: '故事终结', victory: '故事圆满', open: '故事落幕' }
+      screen.classList.add('ending-' + (type || 'death'))
+      document.getElementById('ending-title').textContent = titles[type] || '故事终结'
+      document.getElementById('death-sub').textContent = `${gs.charName} · 第 ${gs.turn} 回合`
+      document.getElementById('ending-desc').textContent = desc || ''
+    }
+
+    function restartSameWorld() {
+      document.getElementById('death-screen').classList.remove('open')
+      const savedWorld = gs.worldBg
+      const savedWorldName = gs.worldBg
+      gs = { worldBg: savedWorld, charName: gs.charName, charBg: gs.charBg, hp: 100, maxHp: 100, stats: { str: 5, int: 5, cha: 5, agi: 5 }, turn: 0, history: [], summary: '', tone: gs.tone || 'dark', nextEventTurn: 3 + Math.floor(Math.random() * 3), saveId: null, saveName: '存档' }
+      document.getElementById('story-area').innerHTML = ''
+      document.getElementById('event-log').innerHTML = ''
+      clearChoices()
+      updateStatUI()
+      addLog('故事重新开始', 'info')
+      addBlock('system', '— 新的故事开始 —')
+      callGM('【游戏开始】请描述主角所处的初始场景，营造氛围，结尾给出2-3个行动选项。', true)
+    }
+
+    function resetGame() {
+      if (!confirm('确定要重新开始吗？')) return
+      document.getElementById('death-screen').classList.remove('open')
+      document.getElementById('game-panel').style.display = 'none'
+      document.getElementById('setup-panel').style.display = 'none'
+      document.getElementById('gen-panel').style.display = 'block'
+      document.getElementById('story-area').innerHTML = ''
+      document.getElementById('event-log').innerHTML = ''
+      document.getElementById('autosave-hint').textContent = ''
+      clearChoices()
+    }
+
+    async function storeFact(narrative) {
+      if (!gs.saveId || !narrative || guestMode) return
+      try {
+        await apiFetch('POST', `/game/saves/${gs.saveId}/facts`, { content: narrative, turn: gs.turn })
+      } catch { }
+    }
+
+    async function autoSave() {
+      if (!gs.worldBg || guestMode) return
+      try {
+        const payload = {
+          save_name: gs.saveName || '自动存档',
+          world_bg: gs.worldBg, char_name: gs.charName, char_bg: gs.charBg,
+          hp: gs.hp, max_hp: gs.maxHp, stats: gs.stats,
+          turn: gs.turn, history: gs.history.slice(-20)
+        }
+        if (gs.saveId) {
+          await apiFetch('PUT', `/game/saves/${gs.saveId}`, payload)
+        } else {
+          const saved = await apiFetch('POST', '/game/saves', payload)
+          gs.saveId = saved.id
+        }
+        const t = new Date().toLocaleTimeString('zh', { hour: '2-digit', minute: '2-digit' })
+        document.getElementById('autosave-hint').textContent = `已存档 ${t}`
+      } catch (e) {
+        console.error('自动存档失败', e)
+      }
+    }
+
+    function exportStory() {
+      const lines = [`异界编年史 · ${gs.charName}的故事`, `世界：${gs.worldBg.slice(0, 80)}`, `共 ${gs.turn} 回合\n${'─'.repeat(40)}\n`]
+      gs.history.forEach(m => {
+        if (m.role === 'user') lines.push(`【${gs.charName}】${m.content}\n`)
+        else if (m.role === 'assistant') lines.push(m.content.replace(/<<<JSON>>>[\s\S]*/, '').trim() + '\n')
+      })
+      const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' })
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(blob)
+      a.download = `${gs.charName}-第${gs.turn}回合.txt`
+      a.click()
+    }
+
+    async function showSaveModal() {
+      if (guestMode) { showToast('请登录后使用存档功能', 'error'); return }
+      document.getElementById('save-name-input').value = gs.saveName || ''
+      document.getElementById('save-modal').classList.add('open')
+      await renderSavesList()
+    }
+
+    function hideSaveModal() {
+      document.getElementById('save-modal').classList.remove('open')
+    }
+
+    async function confirmSave() {
+      const name = document.getElementById('save-name-input').value.trim() || '存档'
+      gs.saveName = name
+      try {
+        const payload = {
+          save_name: name,
+          world_bg: gs.worldBg, char_name: gs.charName, char_bg: gs.charBg,
+          hp: gs.hp, max_hp: gs.maxHp, stats: gs.stats,
+          turn: gs.turn, history: gs.history.slice(-20)
+        }
+        if (gs.saveId) {
+          await apiFetch('PUT', `/game/saves/${gs.saveId}`, payload)
+        } else {
+          const saved = await apiFetch('POST', '/game/saves', payload)
+          gs.saveId = saved.id
+        }
+        const t = new Date().toLocaleTimeString('zh', { hour: '2-digit', minute: '2-digit' })
+        document.getElementById('autosave-hint').textContent = `已存档 ${t}`
+        await renderSavesList()
+      } catch (e) {
+        showToast('存档失败：' + e.message, 'error')
+      }
+    }
+
+    async function renderSavesList() {
+      const list = document.getElementById('saves-list')
+      list.innerHTML = ''
+      try {
+        const saves = await apiFetch('GET', '/game/saves')
+        if (!saves.length) {
+          list.innerHTML = '<div class="no-saves">暂无存档</div>'
+          return
+        }
+        saves.forEach(s => {
+          const updated = new Date(s.updated_at).toLocaleString('zh', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+          const div = document.createElement('div')
+          div.className = 'save-item'
+          const history = s.history || []
+          const lastNarrative = history.filter(m => m.role === 'assistant').slice(-1)[0]?.content || ''
+          const preview = lastNarrative.replace(/<<<JSON>>>[\s\S]*/, '').trim().slice(0, 60).replace(/\n/g, ' ')
+          div.innerHTML = `
+            <div class="save-item-info">
+              <div class="save-item-name">${s.save_name}</div>
+              <div class="save-item-meta">${s.char_name} · 第 ${s.turn} 回合 · ${updated}</div>
+              ${preview ? `<div class="save-item-preview">${preview}…</div>` : ''}
+            </div>
+            <div class="save-item-actions">
+              <button class="load-btn" onclick="loadGame('${s.id}')">读取</button>
+              <button class="del-btn" onclick="deleteSave('${s.id}', this)">删除</button>
+            </div>`
+          list.appendChild(div)
+        })
+      } catch (e) {
+        list.innerHTML = '<div class="no-saves">加载失败</div>'
+      }
+    }
+
+    async function loadGame(saveId) {
+      if (!confirm('读取存档将覆盖当前进度，确定继续？')) return
+      try {
+        const s = await apiFetch('GET', `/game/saves/${saveId}`)
+        gs = {
+          worldBg: s.world_bg, charName: s.char_name, charBg: s.char_bg,
+          hp: s.hp, maxHp: s.max_hp, stats: s.stats,
+          turn: s.turn, history: s.history || [], summary: '',
+          nextEventTurn: s.turn + 3 + Math.floor(Math.random() * 3),
+          saveId: s.id, saveName: s.save_name
+        }
+        hideSaveModal()
+        document.getElementById('setup-panel').style.display = 'none'
+        document.getElementById('game-panel').style.display = 'block'
+        document.getElementById('story-area').innerHTML = ''
+        document.getElementById('event-log').innerHTML = ''
+        clearChoices()
+        updateStatUI()
+        addLog('读取存档：' + s.save_name, 'info')
+        addBlock('system', `— 读取存档：${s.save_name} · 第 ${s.turn} 回合 —`)
+        callGM('【继续游戏】请根据历史对话简短回顾当前场景，然后提供2-3个行动选项。', true)
+      } catch (e) {
+        alert('读档失败：' + e.message)
+      }
+    }
+
+    async function deleteSave(saveId, btn) {
+      if (!confirm('确定删除这个存档？')) return
+      try {
+        await apiFetch('DELETE', `/game/saves/${saveId}`)
+        btn.closest('.save-item').remove()
+        if (gs.saveId === saveId) { gs.saveId = null; gs.saveName = '存档' }
+        if (!document.querySelectorAll('.save-item').length)
+          document.getElementById('saves-list').innerHTML = '<div class="no-saves">暂无存档</div>'
+      } catch (e) {
+        alert('删除失败：' + e.message)
+      }
+    }
+
+    document.getElementById('player-input').addEventListener('keydown', e => { if (e.key === 'Enter') sendAction() })
+
+    document.addEventListener('keydown', e => {
+      if (document.activeElement === document.getElementById('player-input')) return
+      const idx = { '1': 0, '2': 1, '3': 2 }[e.key]
+      if (idx === undefined) return
+      const btns = document.querySelectorAll('#choices-area .choice-btn')
+      if (btns[idx]) btns[idx].click()
+    })
+  </script>
+</body>
+
+</html>
