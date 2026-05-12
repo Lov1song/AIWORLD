@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from alembic.config import Config
 from alembic import command
 from config import APP_ENV, ALLOWED_ORIGINS
-from routers import auth, game, ai, facts, image
+from routers import auth, game, ai, facts, image, stats
 import os
 
 
@@ -38,6 +38,7 @@ app.include_router(game.router)
 app.include_router(ai.router)
 app.include_router(facts.router)
 app.include_router(image.router)
+app.include_router(stats.router)
 
 frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend")
 if os.path.isdir(frontend_path):

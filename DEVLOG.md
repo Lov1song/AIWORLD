@@ -348,6 +348,30 @@ commands JSON 从 `{HP,GOLD,STR,INT,CHA,AGI,ITEMS_ADD,ITEMS_REMOVE}` 缩减为 `
 
 ---
 
+## v0.12 · 访问统计
+
+**日期：** 2026-05-12
+
+### 后端：访问记录接口
+
+- 新增 `backend/routers/stats.py`，两个接口：
+  - `POST /stats/visit`：记录一次页面访问（写入 `page_visits` 表）
+  - `GET /stats/`：返回总访问量、今日访问量、最近 7 天每日明细
+- 新增 `page_visits` 表（id UUID + created_at TIMESTAMPTZ），Alembic 迁移 `a1b2c3d4e5f6`
+- nginx 新增 `location /stats/` 代理规则
+
+### 前端：静默上报 + 显示
+
+- `DOMContentLoaded` 时静默 POST `/stats/visit`（`.catch(() => {})` 失败不报错）
+- 同时拉取 `GET /stats/` 将 `累计访问 N 次 · 今日 N 次` 显示在标题下方（低透明度，不抢眼）
+
+### 数据库端口开放
+
+- `docker-compose.yml` 为 db 服务新增 `ports: 5433:5432`
+- 便于外部数据库客户端连接查看数据（宿主机用 5433，避免与本机 PostgreSQL 冲突）
+
+---
+
 ## v0.11 · 文生图
 
 **日期：** 2026-05-12

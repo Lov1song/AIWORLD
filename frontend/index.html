@@ -1160,6 +1160,7 @@
   <header>
     <h1>异界编年史</h1>
     <p>Chronicle of Other Worlds</p>
+    <p id="visit-count" style="margin-top:6px;font-size:10px;letter-spacing:.15em;opacity:.45;"></p>
     <div class="header-user" id="header-user">
       <span id="header-username"></span>
       <button class="logout-btn" onclick="logout()">退出</button>
@@ -1492,6 +1493,13 @@
     document.addEventListener('DOMContentLoaded', () => {
       const token = localStorage.getItem('token')
       if (token) enterApp()
+
+      // 上报访问 + 显示访客数
+      fetch(API_BASE + '/stats/visit', { method: 'POST' }).catch(() => {})
+      fetch(API_BASE + '/stats').then(r => r.json()).then(d => {
+        const el = document.getElementById('visit-count')
+        if (el && d.total != null) el.textContent = `累计访问 ${d.total} 次 · 今日 ${d.today} 次`
+      }).catch(() => {})
     })
 
     document.addEventListener('keydown', e => {

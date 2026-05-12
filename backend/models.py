@@ -42,6 +42,13 @@ class GameSave(Base):
     facts = relationship("WorldFact", back_populates="save", cascade="all, delete-orphan")
 
 
+class PageVisit(Base):
+    __tablename__ = "page_visits"
+
+    id         = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+
+
 class WorldFact(Base):
     __tablename__ = "world_facts"
 
